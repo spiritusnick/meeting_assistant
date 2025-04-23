@@ -1,0 +1,29 @@
+graph TD
+    subgraph "macOS Device"
+        A[Audio Capture Module] --> |Raw Audio| B[Audio Processing]
+        B --> |Processed Audio| C[Transcription Engine]
+        C --> |Text Transcript| D[OpenAI Integration]
+        D --> |Summaries/Insights| E[User Interface]
+        
+        F[System Audio] --> A
+        G[Microphone Input] --> A
+        
+        H[Local Storage] <--> E
+        H <--> C
+        H <--> D
+        
+        I[Meeting Platform Detection] --> E
+        I --> A
+    end
+    
+    subgraph "Cloud Services"
+        J[OpenAI API] <--> D
+        K[Microsoft SSO] <--> E
+        L[Cloud Storage] <--> H
+    end
+    
+    style A fill:#f9d5e5,stroke:#333,stroke-width:2px
+    style B fill:#eeeeee,stroke:#333,stroke-width:2px
+    style C fill:#d5e8f9,stroke:#333,stroke-width:2px
+    style D fill:#e5f9d5,stroke:#333,stroke-width:2px
+    style E fill:#f9e5d5,stroke:#333,stroke-width:2px

@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnpm-debug.log
+
+# Build outputs
+dist/
+build/
+out/
+*.app
+*.exe
+*.dmg
+*.pkg
+*.zip
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Temp files
+temp/
+tmp/
+.tmp/
+poc/temp/
+
+# Audio recordings (exclude from version control)
+poc/recordings/
+*.wav
+*.mp3
+*.ogg
+*.raw

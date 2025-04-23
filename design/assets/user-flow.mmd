@@ -1,0 +1,36 @@
+graph TD
+    A[Launch App] --> B{First Time?}
+    B -->|Yes| C[Setup Wizard]
+    B -->|No| D[Main Screen]
+    
+    C --> C1[Audio Setup]
+    C1 --> C2[Permissions]
+    C2 --> C3[Account Login]
+    C3 --> C4[Preferences]
+    C4 --> D
+    
+    D --> E{Meeting Status}
+    E -->|No Meeting| F[Standby Mode]
+    E -->|Meeting Detected| G[Prompt to Record]
+    
+    F --> G
+    G -->|User Confirms| H[Recording Mode]
+    G -->|User Declines| F
+    
+    H --> I[Live Transcription]
+    I --> J[AI Processing]
+    
+    H --> K[User Stops Recording]
+    K --> L[Generate Summary]
+    L --> M[Summary View]
+    
+    M --> N{User Action}
+    N -->|Edit| O[Edit Summary]
+    N -->|Export| P[Export Options]
+    N -->|Share| Q[Share Options]
+    N -->|New Meeting| D
+    
+    style A fill:#f9d5e5,stroke:#333,stroke-width:2px
+    style H fill:#d5e8f9,stroke:#333,stroke-width:2px
+    style L fill:#e5f9d5,stroke:#333,stroke-width:2px
+    style M fill:#f9e5d5,stroke:#333,stroke-width:2px
