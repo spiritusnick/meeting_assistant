@@ -4,6 +4,7 @@ npm-debug.log
 yarn-error.log
 yarn-debug.log
 .pnpm-debug.log
+package-lock.json
 
 # Build outputs
 dist/
@@ -14,6 +15,9 @@ out/
 *.dmg
 *.pkg
 *.zip
+.webpack/
+electron-builder-output/
+release/
 
 # Environment variables
 .env
@@ -40,12 +44,30 @@ Thumbs.db
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Temp files
 temp/
 tmp/
 .tmp/
 poc/temp/
+.cache/
+.parcel-cache/
+
+# Electron specific
+.electron-symbols/
+.electron/
+electron/
+
+# Application generated data
+.config/
+.local/
+user-data/
+transcripts/
+summaries/
 
 # Audio recordings (exclude from version control)
 poc/recordings/
@@ -53,3 +75,8 @@ poc/recordings/
 *.mp3
 *.ogg
 *.raw
+
+# Core dumps
+core
+*.core
+core.*

@@ -156,3 +156,35 @@ Communication between Electron's main and renderer processes happens via IPC:
 4. **Future Modularity**:
    - Current structure works for POC but will need more separation of concerns
    - Consider context API for deeper component trees
+
+## Version Control Considerations
+
+The project's `.gitignore` configuration excludes the following categories of files:
+
+1. **Dependencies and Package Managers**:
+   - `node_modules/` directory
+   - `package-lock.json` (~337KB) - regenerated on npm install
+
+2. **Build and Distribution Artifacts**:
+   - `dist/`, `build/`, and `out/` directories
+   - Webpack output (`.webpack/`)
+   - Electron builder output
+   - Application installers and bundles (`.app`, `.exe`, `.dmg`, etc.)
+
+3. **Environment and Configuration**:
+   - `.env` files containing secrets and API keys
+   - Local configuration files
+
+4. **Generated Content**:
+   - `recordings/` directory - audio recordings (potentially large files)
+   - `transcripts/` - text transcriptions
+   - `summaries/` - meeting summaries
+   - All audio files (`.wav`, `.mp3`, `.ogg`, `.raw`)
+
+5. **Temporary and Cache Files**:
+   - Editor-specific files (`.vscode/`, `.idea/`)
+   - OS-generated files (`.DS_Store`)
+   - Temporary directories (`temp/`, `tmp/`)
+   - Electron cache directories
+
+This configuration ensures that only essential source code is versioned, while build artifacts, local configurations, and large generated files are excluded to keep the repository size manageable.
