@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="200" fill="#0071e3"/>
+  
+  <!-- Microphone Icon -->
+  <g transform="translate(512, 512)">
+    <!-- Mic body -->
+    <rect x="-100" y="-300" width="200" height="300" rx="100" fill="white"/>
+    
+    <!-- Mic stand -->
+    <rect x="-20" y="0" width="40" height="150" fill="white"/>
+    <rect x="-80" y="130" width="160" height="40" rx="20" fill="white"/>
+    
+    <!-- Recording indicator -->
+    <circle cx="200" cy="-200" r="80" fill="#ff3333">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Sound waves -->
+    <path d="M -250,-200 Q -300,-100 -250,0" stroke="white" stroke-width="30" fill="none" opacity="0.6"/>
+    <path d="M 250,-200 Q 300,-100 250,0" stroke="white" stroke-width="30" fill="none" opacity="0.6"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="512" y="880" font-family="Arial, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="white">MEETING</text>
+</svg>

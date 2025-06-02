@@ -1,6 +1,6 @@
 # Meeting Assistant Codebase Summary
 
-## Directory Structure
+## Directory Structure (Updated with TypeScript Migration)
 
 ```
 meeting_assistant/
@@ -10,11 +10,17 @@ meeting_assistant/
 ├── poc/                   # Proof of Concept implementation
 │   ├── recordings/        # Directory for saved audio recordings
 │   ├── temp/              # Temporary files directory
+│   ├── prisma/            # Prisma database schema and migrations
+│   │   └── schema.prisma  # Database schema definition
 │   ├── src/               # Source code
-│   │   ├── main.js        # Electron main process
-│   │   ├── preload.js     # Electron preload script for IPC
-│   │   ├── capture.js     # Audio capture functionality
-│   │   ├── transcribe.js  # Transcription functionality
+│   │   ├── main.ts        # Electron main process (TypeScript)
+│   │   ├── preload.ts     # Electron preload script for IPC (TypeScript)
+│   │   ├── capture.ts     # Audio capture functionality (TypeScript)
+│   │   ├── transcribe.ts  # Transcription functionality (TypeScript)
+│   │   ├── summarize.ts   # Summary generation (TypeScript)
+│   │   ├── email.ts       # Email functionality (TypeScript)
+│   │   ├── db.ts          # Database operations (TypeScript)
+│   │   ├── generated/     # Prisma-generated types and clients
 │   │   └── renderer/      # React frontend
 │   │       ├── index.js   # React entry point
 │   │       ├── index.html # HTML template
@@ -35,33 +41,50 @@ meeting_assistant/
 
 ## Architecture Overview
 
-The Meeting Assistant follows an Electron architecture with React for the UI:
+The Meeting Assistant follows an Electron architecture with React for the UI and a Prisma database backend:
 
-1. **Electron Main Process** (`main.js`):
+1. **Electron Main Process** (`main.ts`):
    - Entry point for the application
    - Creates and manages the application window
-   - Sets up IPC handlers for audio capture and transcription
+   - Sets up IPC handlers for audio capture, transcription, and database operations
+   - Initializes the database connection
 
-2. **Preload Script** (`preload.js`):
+2. **Preload Script** (`preload.ts`):
    - Securely exposes IPC communication channels to the renderer
    - Provides a bridge between main process capabilities and renderer UI
 
-3. **Audio Capture Module** (`capture.js`):
+3. **Audio Capture Module** (`capture.ts`):
    - Handles audio recording from selected devices
    - Manages recording state and audio buffers
    - Saves recordings to disk
 
-4. **Transcription Module** (`transcribe.js`):
+4. **Transcription Module** (`transcribe.ts`):
    - Interfaces with OpenAI Whisper API
    - Processes audio data for transcription
    - Returns text transcription results
 
-5. **React UI** (`renderer/`):
+5. **Database Module** (`db.ts`):
+   - Manages database connections using Prisma
+   - Provides methods for CRUD operations on meetings
+   - Handles data migrations and schema updates
+   - Ensures data integrity and relationships
+
+6. **Summary Module** (`summarize.ts`):
+   - Generates meeting summaries using OpenAI's GPT model
+   - Structures summary data with key points, action items, and decisions
+   - Saves summaries to the database
+
+7. **Email Module** (`email.ts`):
+   - Provides functionality to send meeting summaries via email
+   - Manages email templates and formatting
+   - Handles SMTP configuration
+
+8. **React UI** (`renderer/`):
    - Main App component manages application state
    - Specialized components for various UI elements
    - Communicates with main process via IPC bridge
 
-## Data Flow
+## Data Flow (Updated with Database Integration)
 
 ```mermaid
 graph TD
@@ -80,7 +103,7 @@ graph TD
     IPC -->|Invoke stopAudioCapture| Cap
     
     App -->|Transcribe| IPC
-    IPC -->|Invoke startTranscription| Trans[transcribe.js]
+    IPC -->|Invoke startTranscription| Trans[transcribe.ts]
     Trans -->|API Request| OpenAI[OpenAI Whisper API]
     OpenAI -->|Transcription Result| Trans
     Trans -->|Transcription Result| IPC
@@ -89,6 +112,18 @@ graph TD
     App -->|Update State| WF[Waveform]
     App -->|Update State| SB[StatusBar]
     App -->|Update State| TR[Transcription]
+    
+    App -->|Generate Summary| IPC
+    IPC -->|Invoke generateSummary| Sum[summarize.ts]
+    Sum -->|Summary Result| IPC
+    IPC -->|Summary Result| App
+    
+    App -->|Save Meeting| IPC
+    IPC -->|Invoke saveMeeting| DB[db.ts]
+    DB -->|Store Data| Prisma[Prisma Client]
+    Prisma -->|Database Operation| SQLite[SQLite Database]
+    DB -->|Result| IPC
+    IPC -->|Save Result| App
     
     WF -->|Show Visualization| User
     SB -->|Show Status| User
@@ -101,6 +136,7 @@ graph TD
    - Central state manager for the application
    - Coordinates between UI components and IPC bridge
    - Maintains recording state, transcription results, and audio data
+   - Handles database operations for saving and loading meetings
 
 2. **UI Components**:
    - **DeviceSelector**: Lists available audio devices, updates App state on change
@@ -109,12 +145,15 @@ graph TD
    - **Transcription**: Renders transcription results from App state
 
 3. **Main Process Modules**:
-   - **capture.js**: Handles audio recording, sends data back via events
-   - **transcribe.js**: Processes audio for transcription, sends results via events
+   - **capture.ts**: Handles audio recording, sends data back via events
+   - **transcribe.ts**: Processes audio for transcription, sends results via events
+   - **summarize.ts**: Generates meeting summaries from transcriptions
+   - **db.ts**: Handles database operations for persistent storage
+   - **email.ts**: Manages email functionality for sharing summaries
 
 ## State Management
 
-The application uses React's useState hooks for state management:
+The application uses React's useState hooks for state management, with database persistence:
 
 - **isRecording**: Tracks if recording is in progress
 - **audioDevices**: List of available audio input devices
@@ -133,29 +172,50 @@ Communication between Electron's main and renderer processes happens via IPC:
    - `window.api.startAudioCapture()`: Begin recording from selected device
    - `window.api.stopAudioCapture()`: Stop active recording
    - `window.api.startTranscription()`: Request transcription of recorded audio
+   - `window.api.generateSummary()`: Generate meeting summary from transcription
+   - `window.api.saveMeeting()`: Save meeting data to database
+   - `window.api.listMeetings()`: Retrieve list of saved meetings
+   - `window.api.loadMeeting()`: Load a specific meeting by ID
+   - `window.api.sendEmail()`: Send a meeting summary via email
 
 2. **From Main to Renderer**:
    - `audio-data`: Event with chunks of recorded audio
    - `transcription-result`: Event with transcription text
    - `error`: Event with error information
 
+## Technology Stack Updates
+
+1. **TypeScript Migration**:
+   - The codebase has been converted to TypeScript
+   - ESM modules are used for better import/export handling
+   - Types defined for API responses, data models, and state
+
+2. **Database Integration**:
+   - Prisma ORM for database operations
+   - SQLite for local storage (can be scaled to PostgreSQL, MySQL)
+   - Typed data models with relationships
+   - Migration capability for schema changes
+
 ## Challenges and Considerations
 
 1. **Audio Format Handling**:
-   - Current implementation uses raw PCM, may need proper WAV conversion
-   - Buffer handling between processes needs optimization
+   - Current implementation uses raw PCM, with WAV conversion improvements
+   - Buffer handling optimized for cross-process communication
 
 2. **React Integration**:
    - Using useEffect for event listeners and cleanup
-   - Need to ensure proper state updates on asynchronous events
+   - Proper state updates on asynchronous events
+   - TypeScript interfaces for component props
 
 3. **Performance**:
    - Audio visualization can be resource-intensive
    - Large audio files may cause memory pressure
+   - Database queries optimized for quick retrieval
 
-4. **Future Modularity**:
-   - Current structure works for POC but will need more separation of concerns
-   - Consider context API for deeper component trees
+4. **Modularity and Architecture**:
+   - Improved separation of concerns with TypeScript modules
+   - Database layer abstraction for testing and future changes
+   - Context API consideration for deeper component trees
 
 ## Version Control Considerations
 

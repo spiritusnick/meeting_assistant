@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+  // Using default output to node_modules/@prisma/client for runtime import
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Meeting {
+  id          String    @id @default(uuid())
+  title       String
+  date        DateTime  @default(now())
+  duration    Int?      // Meeting duration in seconds
+  fileUrl     String?   // Path to the audio file
+  segments    Segment[]
+  summary     Summary?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Segment {
+  id          String    @id @default(uuid())
+  meetingId   String
+  meeting     Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  text        String
+  startTime   Float     // Start time in seconds
+  endTime     Float     // End time in seconds
+  speaker     String?   // Speaker identifier (if available)
+  confidence  Float?    // Transcription confidence score
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([meetingId])
+}
+
+model Summary {
+  id              String    @id @default(uuid())
+  meetingId       String    @unique
+  meeting         Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  text            String    // Full summary text
+  keyPoints       String?   // Serialized key points
+  actionItems     String?   // Serialized action items
+  decisions       String?   // Serialized decisions made
+  sentimentScore  Float?    // Overall meeting sentiment score
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([meetingId])
+}

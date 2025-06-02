@@ -1,148 +1,177 @@
-# Meeting Assistant
+# Meeting Assistant 🎙️
 
-Meeting Assistant is a tool for recording, transcribing, and summarizing meetings. It captures audio from both system audio and microphone, transcribes it using OpenAI's Whisper API, generates summaries with GPT, and allows sharing via email.
+A smart meeting recorder that automatically transcribes, summarizes, and creates action items from your meetings.
 
 ## Features
 
-- System audio capture using virtual audio devices (BlackHole)
-- Microphone input capture
-- Audio visualization with waveform display
-- Real-time transcription using OpenAI's Whisper API
-- Meeting summarization using OpenAI's GPT API
-- Save meeting data including transcriptions and summaries
-- Email functionality to share meeting summaries
-- Simple, intuitive user interface with tabbed sections
+✨ **Dual Recording Modes**
+- **Virtual Meeting Mode**: Captures system audio from Teams, Zoom, etc.
+- **In-Person Mode**: Records from microphone for physical meetings
 
-## Prerequisites
+🎯 **Smart Audio Routing**
+- Automatically manages audio devices
+- Preserves your ability to hear while recording
+- No manual configuration needed
 
-Before running this application, you'll need:
+🤖 **AI-Powered Processing**
+- Real-time transcription with OpenAI Whisper
+- Intelligent summarization with GPT-4
+- Automatic extraction of action items and decisions
 
-1. **Node.js and npm** - Version 14 or higher
-2. **macOS** - This POC is designed for macOS
-3. **BlackHole** - Virtual audio device for system audio capture
-4. **SOX (Sound eXchange)** - Command-line audio utility used for recording
-5. **OpenAI API Key** - For Whisper transcription
+🚀 **Seamless Experience**
+- System tray app - always accessible
+- Global hotkey (Cmd+Shift+R) for quick recording
+- Email summaries with one click
 
-### Installing SOX
+## Quick Start
 
-SOX is required for audio recording. Install it via Homebrew:
-
-```
-brew install sox
-```
-
-## Setting Up BlackHole for Audio Capture
-
-BlackHole is an open-source virtual audio driver that allows you to capture system audio on macOS.
+### Prerequisites
+- macOS 10.15 or later
+- Node.js 16+ and npm
+- BlackHole 2ch (for system audio capture)
 
 ### Installation
 
-1. Download BlackHole from [Existential Audio](https://existential.audio/blackhole/) or install via Homebrew:
-   ```
-   brew install blackhole-2ch
-   ```
-
-2. Create a Multi-Output Device to route audio to both your speakers and BlackHole:
-   - Open "Audio MIDI Setup" (search in Spotlight)
-   - Click the "+" button in the bottom left corner and select "Create Multi-Output Device"
-   - Check both your regular output device (e.g., speakers or headphones) and "BlackHole 2ch"
-   - Optionally, rename this device to something like "Meeting Assistant Output"
-
-3. Set the Multi-Output Device as your system's default output:
-   - In System Preferences > Sound > Output, select your newly created Multi-Output Device
-   - Alternatively, click the volume icon in the menu bar while holding Option key, then select the Multi-Output Device
-
-Now, any audio played on your system will be routed to both your speakers/headphones and the BlackHole virtual device, which our application can capture.
-
-### Setting Up Combined Audio Input (Microphone + System Audio)
-
-To capture both your microphone and system audio simultaneously:
-
-1. Open "Audio MIDI Setup" (search in Spotlight)
-2. Click the "+" button in the bottom left corner
-3. Select "Create Aggregate Device"
-4. Check both your microphone AND "BlackHole 2ch"
-5. Rename this device to something like "Meeting Assistant Input"
-6. In the Meeting Assistant app, select this Aggregate Device to capture both your voice and system audio
-
-This setup allows you to record both your own voice and any audio playing on your computer (such as other participants in a video call) at the same time.
-
-## Installation
-
-1. Clone or download this repository
-2. Navigate to the project directory
-3. Install dependencies:
-   ```
-   npm install
-   ```
-4. Create a `.env` file based on the provided `.env.example`:
-   ```
-   cp .env.example .env
-   ```
-5. Edit the `.env` file to add your OpenAI API key and configure other settings
-
-## Running the Application
-
-Start the application with:
-
-```
-npm start
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/meeting_assistant.git
+cd meeting_assistant/poc
 ```
 
-### Using the Application
+2. Install dependencies:
+```bash
+npm install
+```
 
-1. Select the appropriate audio device from the dropdown:
-   - Choose "BlackHole 2ch" to capture system audio
-   - Choose your microphone to capture microphone input
+3. Set up audio (one-time):
+```bash
+./scripts/setup-audio.sh
+```
 
-2. Click "Start Recording" to begin capturing audio
+4. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your API keys
+```
 
-3. Play audio from a meeting or speak into your microphone
+5. Launch the app:
+```bash
+./launch.command
+# Or: npm start
+```
 
-4. Click "Stop Recording" when finished
+## Configuration
 
-5. Click "Transcribe" to send the audio to OpenAI's Whisper API for transcription
+### Required API Keys
 
-6. View the transcription results in the text area
+1. **OpenAI API Key**
+   - Get from: https://platform.openai.com/api-keys
+   - Used for transcription and summarization
 
-## Known Limitations
+2. **Email Credentials** (optional)
+   - For Gmail: Create app-specific password
+   - Enables automatic email summaries
 
-This POC has several limitations:
+See [SECURITY.md](poc/SECURITY.md) for detailed setup instructions.
 
-- Audio format conversion is simplified and may not handle all edge cases
-- The waveform visualization is basic and may not accurately represent complex audio
-- Transcription is performed after recording rather than in real-time streaming
-- No speaker diarization (identifying different speakers)
-- Limited error handling and recovery
-- No persistent storage of transcriptions
+## Usage
+
+### Recording a Meeting
+
+1. Click the system tray icon
+2. Select your recording mode:
+   - **Virtual**: For online meetings
+   - **In-Person**: For physical meetings
+3. Press **Cmd+Shift+R** or click "Start Recording"
+4. The icon turns red while recording
+5. Press **Cmd+Shift+R** again to stop
+
+### After Recording
+
+The app automatically:
+- Transcribes your meeting
+- Generates a summary with key points
+- Extracts action items and decisions
+- Offers to email the summary
+
+## Project Structure
+
+```
+meeting_assistant/
+├── poc/                    # Main application
+│   ├── src/               
+│   │   ├── main.ts        # Electron main process
+│   │   ├── renderer/      # React UI components
+│   │   └── services/      # Audio routing, processing
+│   ├── scripts/           # Setup and utility scripts
+│   └── assets/            # Icons and resources
+├── design/                # Architecture documentation
+└── research/              # Technical research notes
+```
+
+## Documentation
+
+- [Audio Setup Guide](poc/AUDIO_SETUP.md) - Configure audio routing
+- [Launch Guide](poc/LAUNCH_GUIDE.md) - Different ways to start the app
+- [Security Guide](poc/SECURITY.md) - API key management
+- [Architecture](design/system-architecture-and-ui.md) - System design
+
+## Development
+
+### Running in Development Mode
+```bash
+npm run dev
+```
+
+### Building for Distribution
+```bash
+npm run build
+```
+
+### Creating Desktop App
+```bash
+./scripts/create-desktop-launcher.sh
+```
 
 ## Troubleshooting
 
-### No Audio Capture
+### No Audio Being Recorded
+1. Ensure BlackHole is installed
+2. Check System Preferences > Security & Privacy > Microphone
+3. Grant permissions to Meeting Assistant
 
-- Ensure BlackHole is properly installed and configured
-- Verify that your Multi-Output Device is set as the system's default output
-- Check that you've selected "BlackHole 2ch" in the application's device dropdown
-- Make sure your system is actually playing audio during recording
+### Can't Start Recording
+- Verify `.env` file has valid `OPENAI_API_KEY`
+- Check console for error messages
+- Try switching recording modes
 
-### Transcription Issues
+## Tech Stack
 
-- Verify your OpenAI API key is correct in the `.env` file
-- Check your internet connection
-- Ensure the audio quality is sufficient for transcription
-- For non-English content, consider specifying the language in the transcription settings
+- **Frontend**: React + TypeScript
+- **Backend**: Electron + Node.js
+- **AI**: OpenAI Whisper + GPT-4
+- **Database**: SQLite with Prisma ORM
+- **Audio**: BlackHole + SOX
+- **Build**: Webpack + electron-builder
 
-## Next Steps
+## Contributing
 
-Future development could include:
-
-- Real-time streaming transcription
-- Speaker diarization
-- Integration with meeting platforms (Teams, Google Meet, etc.)
-- Improved audio processing and noise reduction
-- Summarization of meeting content using OpenAI's GPT models
-- iOS companion app integration
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
 
 ## License
 
-This project is licensed under the ISC License.
+MIT License - see LICENSE file
+
+## Acknowledgments
+
+- [BlackHole](https://existential.audio/blackhole/) for audio routing
+- [OpenAI](https://openai.com) for AI capabilities
+- [Electron](https://electronjs.org) for desktop framework
+
+---
+
+Built with ❤️ for better meetings
